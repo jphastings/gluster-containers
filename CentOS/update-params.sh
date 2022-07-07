@@ -14,15 +14,15 @@ set_cgroup_pids() {
   local pids=$1
   local cgroup max
 
-  cgroup=$(awk -F: '/:pids:/{print $3}' /proc/self/cgroup)
+  cgroup=$(awk -F: '{print $3}' /proc/self/cgroup)
 
-  max=$(cat /sys/fs/cgroup/pids/"${cgroup}"/pids.max)
+  max=$(cat /sys/fs/cgroup/"${cgroup}"/pids.max)
   echo "maximum number of pids configured in cgroups: ${max}"
 
-  echo "${pids}" > /sys/fs/cgroup/pids/"${cgroup}"/pids.max
+  echo "${pids}" > /sys/fs/cgroup/"${cgroup}"/pids.max
   ret=$?
 
-  max=$(cat /sys/fs/cgroup/pids/"${cgroup}"/pids.max)
+  max=$(cat /sys/fs/cgroup/"${cgroup}"/pids.max)
   echo "maximum number of pids configured in cgroups (reconfigured): ${max}"
 
   return ${ret}
