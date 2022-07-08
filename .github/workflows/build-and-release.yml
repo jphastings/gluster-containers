@@ -1,0 +1,50 @@
+name: Build and release Docker images
+
+on:
+  push:
+    branches:
+      - "master"
+
+env:
+  REGISTRY: ghcr.io
+  USER: ${{ github.actor }} # The GitHub user
+  PASSWORD: ${{ secrets.GLFS_SKEY }} # Name of the access token
+  IMAGE_NAME: ${{ github.repository }} # xlates to <username>/<repo>
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the current repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Run the tests
+      - name: Run linter tests
+        run: |
+          sudo apt install shellcheck
+          sudo npm install -g dockerfile_lint
+          make
+
+      # Login to docker
+      - name: Login to package registry
+        run: echo ${{ env.PASSWORD }} | docker login ${{ env.REGISTRY }} -u ${{ env.USER }} --password-stdin
+
+      # Build CentOS image and tag it (latest, centos)
+      - name: Build CentOS image
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:centos CentOS
+
+      # Build Fedora image and tag it
+      - name: Build Fedora image
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:fedora Fedora
+
+      # Push CentOS
+      - name: Push CentOS image
+        run: |
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:centos ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:centos
+
+      # Push Fedora
+      - name: Push Fedora image
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:fedora
