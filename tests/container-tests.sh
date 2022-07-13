@@ -9,6 +9,12 @@ if [[ -z $1 ]]; then
   exit 1
 fi
 
+# We need to have docker installed to run this test.
+which docker > /dev/null 2>&1 || {
+    echo "docker is not installed. Please install docker first."
+    exit 1
+}
+
 BUILD_TAG="${1}-test"
 BUILD_VARIANT="../CentOS"
 
@@ -16,20 +22,13 @@ if [[ $BUILD_TAG == "fedora-test" ]]; then
     BUILD_VARIANT="../Fedora"
 fi
 
-# We need to have docker installed to run this test.
-which docker > /dev/null 2>&1 || {
-    echo "docker is not installed. Please install docker first."
-    exit 1
-}
-
-echo "Running tests for container ${BUILD_TAG}, building from ${BUILD_VARIANT}"
-
 build_image() {
     echo "Building image for ${BUILD_TAG}"
     docker build -t $BUILD_TAG $BUILD_VARIANT
 }
 
 run_image() {
+    echo "Trying to run the built image"
     # Make the required dirs
     sudo mkdir -p /home/gluster/etc/glusterfs \
         /home/gluster/var/log/glusterfs \
@@ -46,14 +45,17 @@ run_image() {
         --privileged --cgroupns=host --net=host \
         $BUILD_TAG
 
-    echo "Sleeping for 15 seconds to let the container start."
+    echo "Container started. Sleeping for 15 seconds to let it boot."
     sleep 15
 }
 
 query_image() {
+    echo "Checking glusterd status in the built image"
+
     # Check if the glusterd is running in the container
     docker exec -it $BUILD_TAG \
-        systemctl is-active glusterd | grep -o "active"
+        systemctl is-active glusterd | grep -o "active" || \
+        { echo "glusterd is not running in the container"; exit 1; }
 }
 
 clean_image() {
@@ -81,6 +83,8 @@ clean_image() {
 }
 
 main() {
+    echo "Running tests for container ${BUILD_TAG}, building from ${BUILD_VARIANT}"
+
     build_image
     run_image
     query_image
@@ -88,7 +92,6 @@ main() {
 }
 
 trap clean_image EXIT
-
 main
 
 echo "Successfully completed running tests for container ${BUILD_TAG}"
