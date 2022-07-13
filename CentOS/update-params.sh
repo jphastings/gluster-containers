@@ -10,6 +10,42 @@
 : ${TCMU_LOCKDIR:=/var/run/lock}
 
 set_cgroup_pids() {
+  # Check if system is using unified cgroups i.e. v2
+  # We can cat /proc/filesystems, it'll have an entry for cgroups v2
+  # But systemd already does this for us, so we can just query it.
+  cgroupVer=$(systemctl show -all | grep -o "default-hierarchy.*" | cut -d '=' -f2)
+  
+  # Call relevant functions, v2 is for unified, v1 is for legacy cgroups
+  if [[ "${cgroupVer}" == "unified" ]]
+  then
+    echo "Systemd is using unified cgroups(v2)"
+    set_cgroup_pids_v2 $1
+  else
+    echo "Systemd is using legacy cgroups(v1)"
+    set_cgroup_pids_v1 $1
+  fi
+}
+
+set_cgroup_pids_v1() {
+  local ret=0
+  local pids=$1
+  local cgroup max
+
+  cgroup=$(awk -F: '/:pids:/{print $3}' /proc/self/cgroup)
+
+  max=$(cat /sys/fs/cgroup/pids/"${cgroup}"/pids.max)
+  echo "maximum number of pids configured in cgroups: ${max}"
+
+  echo "${pids}" > /sys/fs/cgroup/pids/"${cgroup}"/pids.max
+  ret=$?
+
+  max=$(cat /sys/fs/cgroup/pids/"${cgroup}"/pids.max)
+  echo "maximum number of pids configured in cgroups (reconfigured): ${max}"
+
+  return ${ret}
+}
+
+set_cgroup_pids_v2() {
   local ret=0
   local pids=$1
   local cgroup max
