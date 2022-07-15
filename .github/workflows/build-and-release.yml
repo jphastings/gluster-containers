@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   USER: ${{ github.actor }} # The GitHub user
-  PASSWORD: ${{ secrets.GLFS_SKEY }} # Name of the access token
+  PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   IMAGE_NAME: ${{ github.repository }} # xlates to <username>/<repo>
 
 jobs:
