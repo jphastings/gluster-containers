@@ -70,7 +70,7 @@ This way all the gluster containers started will be time synchronized.
 Now run the following command:
 
 ~~~
-$ docker run -v /etc/glusterfs:/etc/glusterfs:z -v /var/lib/glusterd:/var/lib/glusterd:z -v /var/log/glusterfs:/var/log/glusterfs:z -v /sys/fs/cgroup:/sys/fs/cgroup:rw -d --privileged=true --net=host -v /dev/:/dev --cgroupns=host gluster/gluster-centos
+$ docker run -v /etc/glusterfs:/etc/glusterfs:z -v /var/lib/glusterd:/var/lib/glusterd:z -v /var/log/glusterfs:/var/log/glusterfs:z -v /sys/fs/cgroup:/sys/fs/cgroup:rw -d --privileged=true --net=host -v /dev/:/dev --cgroupns=host gluster-centos
 ~~~
 
 ( is either gluster-fedora or gluster-centos as per the configurations so far)
