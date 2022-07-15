@@ -30,16 +30,17 @@ build_image() {
 run_image() {
     echo "Trying to run the built image"
     # Make the required dirs
-    sudo mkdir -p /home/gluster/etc/glusterfs \
-        /home/gluster/var/log/glusterfs \
-        /home/gluster/var/lib/glusterd
+    # Err check not required because (set -e)
+    etcDir=$(mktemp -d)
+    logDir=$(mktemp -d)
+    libDir=$(mktemp -d)
 
 
     # Run the container and sleep for a while to let it start
     docker run -d --rm --name=$BUILD_TAG \
-        -v /home/gluster/etc/glusterfs:/etc/glusterfs:z \
-        -v /home/gluster/var/log/glusterfs:/var/log/glusterfs:z \
-        -v /home/gluster/var/lib/glusterd:/var/lib/glusterd:z \
+        -v "${etcDir}":/etc/glusterfs:z \
+        -v "${logDir}":/var/log/glusterfs:z \
+        -v "${libDir}":/var/lib/glusterd:z \
         -v /dev:/dev:z \
         -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
         --privileged --cgroupns=host --net=host \
@@ -54,12 +55,14 @@ query_image() {
 
     # Check if the glusterd is running in the container
     docker exec -it $BUILD_TAG \
-        systemctl is-active glusterd | grep -o "active" || \
+        systemctl is-active glusterd || \
         { echo "glusterd is not running in the container"; exit 1; }
 }
 
 clean_image() {
-    echo "Test for container ${BUILD_TAG} failed! Cleaning up."
+    if [[ $? -ne 0 ]]; then
+        echo "Tests for container ${BUILD_TAG} failed! Cleaning up."
+    fi
 
     # This may be called on some other error too. Check if the container is built or not.
     if [[ $(docker images -q $BUILD_TAG) ]]; then
@@ -76,10 +79,7 @@ clean_image() {
         docker rmi $BUILD_TAG
     fi
 
-    # Remove the directories we created for the container.
-    sudo rm -rf /home/gluster/etc/glusterfs \
-        /home/gluster/var/log/glusterfs \
-        /home/gluster/var/lib/glusterd
+    # We created temp dirs for glfs, no need to rm them manually
 }
 
 main() {
@@ -88,7 +88,6 @@ main() {
     build_image
     run_image
     query_image
-    clean_image
 }
 
 trap clean_image EXIT
