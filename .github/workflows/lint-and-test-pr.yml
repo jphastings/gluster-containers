@@ -1,0 +1,27 @@
+name: Linter and Container tests
+
+on:
+  pull_request:
+    branches:
+      - "master"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the current repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Run the linter tests
+      - name: Run linter tests
+        run: |
+          sudo apt install shellcheck
+          sudo npm install -g dockerfile_lint
+          make
+
+      # Run the container tests
+      - name: Run container tests
+        run: |
+          chmod +x tests/container-tests.sh
+          tests/container-tests.sh {centos,fedora}
