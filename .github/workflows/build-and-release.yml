@@ -52,7 +52,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       # Build and push Fedora image
-      - name: Build and push CentOS image for amd64 and arm64
+      - name: Build and push Fedora image for amd64 and arm64
         uses: docker/build-push-action@v3
         with:
           push: true
