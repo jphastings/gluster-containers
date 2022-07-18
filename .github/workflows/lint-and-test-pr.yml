@@ -13,15 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Run the linter tests
-      - name: Run linter tests
+      # Prepare the runner
+      - name: Prepare the runner
         run: |
           sudo apt install shellcheck
           sudo npm install -g dockerfile_lint
-          make
-
-      # Run the container tests
-      - name: Run container tests
-        run: |
           chmod +x tests/container-tests.sh
-          tests/container-tests.sh {centos,fedora}
+
+      # Run the linter tests
+      - name: Run linter tests
+        run: make
+
+      # Run the container tests for CentOS
+      - name: Run CentOS container tests
+        run: tests/container-tests.sh centos
+
+      # Run the container tests for Fedora
+      - name: Run Fedora container tests
+        run: tests/container-tests.sh fedora
