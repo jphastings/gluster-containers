@@ -4,6 +4,9 @@
 # Exit if any of the commands return a non zero exit code.
 set -e
 
+# Allow script to be executed both by abs and relative paths
+cd $(dirname $0)
+
 if [[ -z $1 ]]; then
   echo "Usage: $0 <fedora|centos>"
   exit 1
