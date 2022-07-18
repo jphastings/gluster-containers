@@ -9,11 +9,7 @@ cd $(dirname $0)
 
 # GH Actions doesn't support TTY but one may manually run this script locally
 # Add conditional TTY support
-test -t 1 && \
-    {
-        USE_TTY="-t"
-        echo "TTY support is 1"
-    }
+test -t 1 && USE_TTY="-t"
 
 if [[ -z $1 ]]; then
   echo "Usage: $0 <fedora|centos>"
