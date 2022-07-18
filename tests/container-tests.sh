@@ -7,6 +7,14 @@ set -e
 # Allow script to be executed both by abs and relative paths
 cd $(dirname $0)
 
+# GH Actions doesn't support TTY but one may manually run this script locally
+# Add conditional TTY support
+test -t 1 && \
+    {
+        USE_TTY="-t"
+        echo "TTY support is 1"
+    }
+
 if [[ -z $1 ]]; then
   echo "Usage: $0 <fedora|centos>"
   exit 1
@@ -57,7 +65,7 @@ query_image() {
     echo "Checking glusterd status in the built image"
 
     # Check if the glusterd is running in the container
-    docker exec -it $BUILD_TAG \
+    docker exec -i $USE_TTY $BUILD_TAG \
         systemctl is-active glusterd || \
         { echo "glusterd is not running in the container"; exit 1; }
 }
