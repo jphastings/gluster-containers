@@ -26,25 +26,36 @@ jobs:
           sudo npm install -g dockerfile_lint
           make
 
-      # Login to docker
+      # Login to GitHub package registry with Docker
       - name: Login to package registry
-        run: echo ${{ env.PASSWORD }} | docker login ${{ env.REGISTRY }} -u ${{ env.USER }} --password-stdin
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.USER }}
+          password: ${{ env.PASSWORD }}
 
-      # Build CentOS image and tag it (latest, centos)
-      - name: Build CentOS image
-        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:centos CentOS
+      # Set up QEMU (multi-platform)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-      # Build Fedora image and tag it
-      - name: Build Fedora image
-        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:fedora Fedora
+      # Set up Docker buildx (multi-platform)
+      - name: Set up Docker BuildX
+        uses: docker/setup-buildx-action@v2
 
-      # Push CentOS
-      - name: Push CentOS image
-        run: |
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:centos ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:centos
+      # Build and push CentOS image
+      - name: Build and push CentOS image for amd64 and arm64
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: ./CentOS
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:centos,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          platforms: linux/amd64,linux/arm64
 
-      # Push Fedora
-      - name: Push Fedora image
-        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:fedora
+      # Build and push Fedora image
+      - name: Build and push CentOS image for amd64 and arm64
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: ./Fedora
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:fedora
+          platforms: linux/amd64,linux/arm64
