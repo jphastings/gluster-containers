@@ -18,7 +18,6 @@ jobs:
         run: |
           sudo apt install shellcheck
           sudo npm install -g dockerfile_lint
-          chmod +x tests/container-tests.sh
 
       # Run the linter tests
       - name: Run linter tests
