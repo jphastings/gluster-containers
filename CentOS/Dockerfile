@@ -15,7 +15,7 @@ LABEL architecture="$ARCH" \
       description="Gluster Image is based on CentOS Image which is a scalable network filesystem. Using common off-the-shelf hardware, you can create large, distributed storage solutions for media streaming, data analysis, and other data- and bandwidth-intensive tasks." \
       io.openshift.tags="gluster,glusterfs,glusterfs-centos"
 
-RUN yum --setopt=tsflags=nodocs -y update && yum install -y centos-release-gluster9 && yum clean all && \
+RUN yum --setopt=tsflags=nodocs -y update && yum install -y centos-release-gluster && yum clean all && \
 (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done) && \
 rm -f /lib/systemd/system/multi-user.target.wants/* &&\
 rm -f /etc/systemd/system/*.wants/* &&\
@@ -34,6 +34,7 @@ yum --setopt=tsflags=nodocs -y install rsync  && \
 yum --setopt=tsflags=nodocs -y install tar  && \
 yum --setopt=tsflags=nodocs -y install cronie  && \
 yum --setopt=tsflags=nodocs -y install xfsprogs  && \
+yum --setopt=tsflags=nodocs -y install http://mirror.centos.org/centos/7/os/x86_64/Packages/gperftools-libs-2.6.1-1.el7.x86_64.rpm  && \
 yum --setopt=tsflags=nodocs -y install glusterfs  && \
 yum --setopt=tsflags=nodocs -y install glusterfs-server  && \
 yum --setopt=tsflags=nodocs -y install glusterfs-rdma  && \
