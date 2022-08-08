@@ -89,7 +89,7 @@ RUN true \
 
 
 VOLUME [ "/sys/fs/cgroup" ]
-WORKDIR [ "/tmp" ]
+WORKDIR /tmp
 
 COPY . .
 RUN bash setup-services.sh
