@@ -89,10 +89,14 @@ RUN true \
 
 
 VOLUME [ "/sys/fs/cgroup" ]
-WORKDIR /tmp
 
-COPY . .
-RUN bash setup-services.sh
+COPY . /tmp/container-setup
+RUN true \
+    && cd /tmp/container-setup \
+    && ./setup-services.sh \
+    && cd - \
+    && rm -rf /tmp/container-setup \
+    && true
 
 EXPOSE 2222 111 245 443 24007 2049 8080 6010 6011 6012 38465 38466 38468 38469 49152 49153 49154 49156 49157 49158 49159 49160 49161 49162
 
