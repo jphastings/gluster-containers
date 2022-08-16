@@ -34,7 +34,6 @@ yum --setopt=tsflags=nodocs -y install rsync  && \
 yum --setopt=tsflags=nodocs -y install tar  && \
 yum --setopt=tsflags=nodocs -y install cronie  && \
 yum --setopt=tsflags=nodocs -y install xfsprogs  && \
-yum --setopt=tsflags=nodocs -y install http://mirror.centos.org/centos/7/os/x86_64/Packages/gperftools-libs-2.6.1-1.el7.x86_64.rpm  && \
 yum --setopt=tsflags=nodocs -y install glusterfs  && \
 yum --setopt=tsflags=nodocs -y install glusterfs-server  && \
 yum --setopt=tsflags=nodocs -y install glusterfs-rdma  && \
