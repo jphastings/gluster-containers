@@ -89,35 +89,14 @@ RUN true \
 
 
 VOLUME [ "/sys/fs/cgroup" ]
-ADD gluster-fake-disk.service /etc/systemd/system/gluster-fake-disk.service
-ADD fake-disk.sh /usr/libexec/gluster/fake-disk.sh
-ADD gluster-setup.service /etc/systemd/system/gluster-setup.service
-ADD gluster-setup.sh /usr/sbin/gluster-setup.sh
-ADD gluster-block-setup.service /etc/systemd/system/gluster-block-setup.service
-ADD gluster-block-setup.sh /usr/sbin/gluster-block-setup.sh
-ADD update-params.sh /usr/local/bin/update-params.sh
-ADD status-probe.sh /usr/local/bin/status-probe.sh
-ADD tcmu-runner-params /etc/sysconfig/tcmu-runner-params
-ADD gluster-check-diskspace.service  /etc/systemd/system/gluster-check-diskspace.service
-ADD check_diskspace.sh /usr/local/bin/check_diskspace.sh
-ADD exec-on-host.sh /usr/sbin/exec-on-host
 
-RUN chmod 644 /etc/systemd/system/gluster-setup.service && \
-chmod 644 /etc/systemd/system/gluster-check-diskspace.service && \
-chmod 755 /usr/libexec/gluster/fake-disk.sh && \
-chmod 500 /usr/sbin/gluster-setup.sh && \
-chmod 644 /etc/systemd/system/gluster-block-setup.service && \
-chmod 500 /usr/sbin/gluster-block-setup.sh && \
-chmod +x /usr/local/bin/update-params.sh && \
-chmod +x /usr/local/bin/status-probe.sh && \
-chmod +x /usr/local/bin/check_diskspace.sh && \
-systemctl disable nfs-server.service && \
-systemctl enable gluster-fake-disk.service && \
-systemctl enable gluster-setup.service && \
-systemctl enable gluster-block-setup.service && \
-systemctl enable gluster-blockd.service && \
-systemctl enable glusterd.service && \
-systemctl enable gluster-check-diskspace.service
+COPY . /tmp/container-setup
+RUN true \
+    && cd /tmp/container-setup \
+    && ./setup-services.sh \
+    && cd - \
+    && rm -rf /tmp/container-setup \
+    && true
 
 EXPOSE 2222 111 245 443 24007 2049 8080 6010 6011 6012 38465 38466 38468 38469 49152 49153 49154 49156 49157 49158 49159 49160 49161 49162
 
