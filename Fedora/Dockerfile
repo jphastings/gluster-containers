@@ -33,6 +33,14 @@ RUN dnf -y update && \
     sed -i "s/LANG/\#LANG/g" /etc/locale.conf && \
     dnf -y install systemd-udev glusterfs-server python3-dbus nfs-utils attr iputils iproute glusterfs-geo-replication openssh-server openssh-clients cronie tar rsync sos xfsprogs && \
     dnf clean all && \
+    (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done) && \
+    rm -f /lib/systemd/system/multi-user.target.wants/* &&\
+    rm -f /etc/systemd/system/*.wants/* &&\
+    rm -f /lib/systemd/system/local-fs.target.wants/* && \
+    rm -f /lib/systemd/system/sockets.target.wants/*udev* && \
+    rm -f /lib/systemd/system/sockets.target.wants/*initctl* && \
+    rm -f /lib/systemd/system/basic.target.wants/* &&\
+    rm -f /lib/systemd/system/anaconda.target.wants/* &&\
     sed -i '/Port 22/c\Port 2222' /etc/ssh/sshd_config && \
     sed -i 's/Requires\=rpcbind\.service//g' /usr/lib/systemd/system/glusterd.service && \
     sed -i 's/rpcbind\.service/gluster-setup\.service/g' /usr/lib/systemd/system/glusterd.service && \
