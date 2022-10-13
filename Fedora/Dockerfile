@@ -29,9 +29,23 @@ COPY gluster-setup.sh gluster-brickmultiplex.service gluster-brickmultiplex.sh g
 COPY gluster-fake-disk.service /etc/systemd/system/gluster-fake-disk.service
 COPY fake-disk.sh /usr/libexec/gluster/fake-disk.sh
 
-RUN dnf -y update && \
+RUN dnf --nodocs -y update && \
     sed -i "s/LANG/\#LANG/g" /etc/locale.conf && \
-    dnf -y install systemd-udev glusterfs-server python3-dbus nfs-utils attr iputils iproute glusterfs-geo-replication openssh-server openssh-clients cronie tar rsync sos xfsprogs && \
+    dnf --nodocs -y install systemd-udev && \
+    dnf --nodocs -y install glusterfs-server && \
+    dnf --nodocs -y install python3-dbus && \
+    dnf --nodocs -y install nfs-utils && \
+    dnf --nodocs -y install attr && \
+    dnf --nodocs -y install iputils && \
+    dnf --nodocs -y install iproute && \
+    dnf --nodocs -y install glusterfs-geo-replication && \
+    dnf --nodocs -y install openssh-server && \
+    dnf --nodocs -y install openssh-clients && \
+    dnf --nodocs -y install cronie && \
+    dnf --nodocs -y install tar && \
+    dnf --nodocs -y install rsync && \
+    dnf --nodocs -y install sos && \
+    dnf --nodocs -y install xfsprogs && \
     dnf clean all && \
     (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done) && \
     rm -f /lib/systemd/system/multi-user.target.wants/* &&\
