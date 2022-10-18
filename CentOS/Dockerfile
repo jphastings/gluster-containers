@@ -15,7 +15,7 @@ LABEL architecture="$ARCH" \
       description="Gluster Image is based on CentOS Image which is a scalable network filesystem. Using common off-the-shelf hardware, you can create large, distributed storage solutions for media streaming, data analysis, and other data- and bandwidth-intensive tasks." \
       io.openshift.tags="gluster,glusterfs,glusterfs-centos"
 
-RUN yum --setopt=tsflags=nodocs -y update && yum install -y centos-release-gluster && \
+RUN dnf --nodocs -y update && dnf --nodocs -y install centos-release-gluster && \
 (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done) && \
 rm -f /lib/systemd/system/multi-user.target.wants/* &&\
 rm -f /etc/systemd/system/*.wants/* &&\
@@ -24,21 +24,21 @@ rm -f /lib/systemd/system/sockets.target.wants/*udev* && \
 rm -f /lib/systemd/system/sockets.target.wants/*initctl* && \
 rm -f /lib/systemd/system/basic.target.wants/* &&\
 rm -f /lib/systemd/system/anaconda.target.wants/* &&\
-yum --setopt=tsflags=nodocs -y install nfs-utils && \
-yum --setopt=tsflags=nodocs -y install attr  && \
-yum --setopt=tsflags=nodocs -y install iputils  && \
-yum --setopt=tsflags=nodocs -y install iproute  && \
-yum --setopt=tsflags=nodocs -y install openssh-server  && \
-yum --setopt=tsflags=nodocs -y install openssh-clients  && \
-yum --setopt=tsflags=nodocs -y install rsync  && \
-yum --setopt=tsflags=nodocs -y install tar  && \
-yum --setopt=tsflags=nodocs -y install cronie  && \
-yum --setopt=tsflags=nodocs -y install xfsprogs  && \
-yum --setopt=tsflags=nodocs -y install glusterfs  && \
-yum --setopt=tsflags=nodocs -y install glusterfs-server  && \
-yum --setopt=tsflags=nodocs -y install glusterfs-rdma  && \
-yum --setopt=tsflags=nodocs -y install gluster-block  && \
-yum --setopt=tsflags=nodocs -y install glusterfs-geo-replication && yum clean all && \
+dnf --nodocs -y install nfs-utils && \
+dnf --nodocs -y install attr  && \
+dnf --nodocs -y install iputils  && \
+dnf --nodocs -y install iproute  && \
+dnf --nodocs -y install openssh-server  && \
+dnf --nodocs -y install openssh-clients  && \
+dnf --nodocs -y install rsync  && \
+dnf --nodocs -y install tar  && \
+dnf --nodocs -y install cronie  && \
+dnf --nodocs -y install xfsprogs  && \
+dnf --nodocs -y install glusterfs  && \
+dnf --nodocs -y install glusterfs-server  && \
+dnf --nodocs -y install glusterfs-rdma  && \
+dnf --nodocs -y install gluster-block  && \
+dnf --nodocs -y install glusterfs-geo-replication && dnf clean all && \
 sed -i '/Port 22/c\Port 2222' /etc/ssh/sshd_config && \
 sed -i 's/Requires\=rpcbind\.service//g' /usr/lib/systemd/system/glusterd.service && \
 sed -i 's/rpcbind\.service/gluster-setup\.service/g' /usr/lib/systemd/system/glusterd.service && \
